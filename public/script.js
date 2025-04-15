@@ -1,6 +1,7 @@
 let BOARD_SIZE = 20;
 const cellSize = calculateCellSize();
 let board;
+let player;
 
 document.getElementById("new-game-btn").addEventListener('click',startGame);
 
@@ -25,7 +26,7 @@ function startGame(){
 function generateRandomBoard(){
     const newBoard = Array.from({length: BOARD_SIZE}, ()=> Array(BOARD_SIZE).fill(' '));
     console.log(newBoard);
-
+    //Tehdään ulkoseinät
     for(let y = 0; y < BOARD_SIZE; y++){
         for(let x = 0; x < BOARD_SIZE; x++){
             if(y == 0 || y == BOARD_SIZE-1 || x==0 || x== BOARD_SIZE -1){
@@ -33,7 +34,11 @@ function generateRandomBoard(){
             }
         }
     }
+    //Tehdään pelilaudan keskelle esteet
     generateObstacles(newBoard);
+    //newBoard[19][7] = 'P';
+    const [playerX, playerY] = randomEmptyPosition(newBoard);
+    setCell(newBoard, playerX, playerY, 'P')
     return newBoard;
 }
 
@@ -55,6 +60,9 @@ function drawBoard(board){
 
             if(board[y][x]=='W'){
                 cell.classList.add('wall');
+            }
+            else if(board[y][x]=='P'){
+                cell.classList.add('player');
             }
             gameBoard.appendChild(cell);
         }
@@ -100,3 +108,29 @@ function placeObstacle(board, obstacle, startX, startY) {
         board[startY + y][startX + x] = 'W';
     }
 }
+//Tämä on apufunktio satunnaisen kokonaisluvun arpomista varten
+function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function randomEmptyPosition(board){
+    x = randomInt(1, BOARD_SIZE-2);
+    y = randomInt(1, BOARD_SIZE-2);
+    if (getCell(board, x, y)  === ' ') {
+        return [x, y];
+    } 
+    else {
+        return randomEmptyPosition(board);
+    }
+
+}
+
+//Asetetaan solun sisältö
+function setCell(board, x, y, value) {
+    board[y][x] = value;
+ }
+//Palautetaan solun sisältö
+function getCell(board, x, y) {
+       return board[y][x];
+}
+
