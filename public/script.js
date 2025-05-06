@@ -87,6 +87,9 @@ function drawBoard(board){
             else if(board[y][x]=='P'){
                 cell.classList.add('player');
             }
+            else if(board[y][x]=='H'){
+                cell.classList.add('hornmonster');
+            }
             gameBoard.appendChild(cell);
         }
     }        
