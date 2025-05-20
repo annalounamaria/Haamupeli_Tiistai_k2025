@@ -4,6 +4,7 @@ let board;
 let player;
 let ghosts = [];
 
+
 document.getElementById("new-game-btn").addEventListener('click',startGame);
 document.addEventListener('keydown', (event) => {
     switch (event.key) {
@@ -52,6 +53,7 @@ function startGame(){
 
     player = new Player(0,0);
     board = generateRandomBoard();
+
     drawBoard(board);
 }
 
@@ -190,8 +192,47 @@ function generateGhosts(board){
 }
 
 function shootAt(x, y) {
+    if(getCell(board,x,y) ==='W'){
+        return;
+    }
+
+    const ghostIndex = ghosts.findIndex(ghost=> ghost.x === x && ghost.y === y);
+    if (ghostIndex !== -1) {
+        // Remove the ghost from the list
+        ghosts.splice(ghostIndex, 1);
+    }
+    console.log(ghosts);
+
     setCell(board, x, y, 'B');    
     drawBoard(board);
+
+    if (ghosts.length === 0){
+        alert('kaikki ammuttu');
+    }
+}
+
+function moveGhosts(){
+    const oldGhosts = ghosts.map(ghost => ({ x: ghost.x, y: ghost.y }));
+
+    ghosts.forEach(ghost => {
+        // Määrittele mahdolliset uudet paikat (ylös, alas, vasemmalle, oikealle)
+        const possibleNewPositions = [
+            { x: ghost.x, y: ghost.y - 1 }, // Ylös
+            { x: ghost.x, y: ghost.y + 1 }, // Alas
+            { x: ghost.x - 1, y: ghost.y }, // Vasemmalle
+            { x: ghost.x + 1, y: ghost.y }  // Oikealle
+        ];
+        
+        
+        // Suodata pois paikat, jotka eivät ole pelilaudan sisällä tai ovat seiniä
+        const validNewPositions = possibleNewPositions.filter(newPosition =>
+        newPosition.x >= 0 && newPosition.x < BOARD_SIZE &&
+        newPosition.y >= 0 && newPosition.y < BOARD_SIZE &&
+                    board[newPosition.y][newPosition.x] === ' ' // Tarkista, että ruutu on tyhjä
+        );
+
+    });///<-tuo puuttui! siksi jäi virheeseen!
+  
 }
 
 class Player{
