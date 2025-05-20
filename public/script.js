@@ -4,10 +4,12 @@ let board;
 let player;
 let ghosts = [];
 let ghostSpeed = 1000; // Aloitusnopeus haamuille (millisekunteina)
-
+let isGameRunning = false;
+let ghostInterval;
 
 document.getElementById("new-game-btn").addEventListener('click',startGame);
 document.addEventListener('keydown', (event) => {
+    if(isGameRunning){
     switch (event.key) {
         case 'ArrowUp':
             player.move(0, -1); // Liikuta ylös
@@ -35,6 +37,7 @@ document.addEventListener('keydown', (event) => {
             break;
     }
     event.preventDefault(); // Prevent default scrolling behaviour
+    }
 });
 
 function calculateCellSize() {
@@ -49,12 +52,15 @@ function calculateCellSize() {
 
 function startGame(){
     console.log("KLIKATTU");
+    isGameRunning = true; // Peli käynnissä
     document.getElementById("intro-screen").style.display='none';
     document.getElementById("game-screen").style.display='block';
 
     player = new Player(0,0);
     board = generateRandomBoard();
-    setInterval(moveGhosts, ghostSpeed);
+    setTimeout(() => {
+        ghostInterval = setInterval(moveGhosts, ghostSpeed);
+    },1000);
     drawBoard(board);
 }
 
@@ -183,6 +189,7 @@ function getCell(board, x, y) {
 }
 
 function generateGhosts(board){
+    ghosts = [];
     for (let i = 0; i < 5; i++) {
         const [ghostX, ghostY] = randomEmptyPosition(board);
         console.log(ghostX,ghostY);
@@ -222,8 +229,13 @@ function moveGhosts(){
         ghost.y = newPosition.y;
         
         setCell(board, ghost.x, ghost.y, 'H');
+        // Check if ghost touches the player
+        if (ghost.x === player.x && ghost.y === player.y) {
+          endGame() // End the game
+        return;
+      }
 
-    });
+});
         
     // Tyhjennä vanhat haamujen paikat laudalta
     oldGhosts.forEach(ghost => {
@@ -316,4 +328,14 @@ class Ghost{
         return { x: this.x, y: this.y };
 
     }
+}
+
+function endGame() {
+  isGameRunning = false;
+  clearInterval(ghostInterval);
+  alert('Game Over! The ghost caught you!');
+
+  // Show intro-view ja hide game-view
+  document.getElementById('intro-screen').style.display = 'block';
+  document.getElementById('game-screen').style.display = 'none';
 }
